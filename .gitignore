@@ -12,7 +12,7 @@
 /logs
 /feeds
 /feeds.conf
-/files
+/files/lib/modules
 /overlay
 /package/feeds
 /package/openwrt-packages
@@ -31,3 +31,6 @@ git-src
 .cproject
 .ccache
 .vscode*
+
+/files/etc/rom-version
+/base-extras/

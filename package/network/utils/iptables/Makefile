@@ -634,8 +634,11 @@ endef
 
 define Package/libxtables/install
 	$(INSTALL_DIR) $(1)/usr/lib
+	$(INSTALL_DIR) $(1)/usr/lib/iptables
 	$(CP) $(PKG_INSTALL_DIR)/usr/lib/libxtables.so.* $(1)/usr/lib/
 	$(CP) $(PKG_BUILD_DIR)/extensions/libiptext.so $(1)/usr/lib/
+	$(CP) $(PKG_BUILD_DIR)/extensions/libxt_conntrack.so $(1)/usr/lib/iptables/
+	$(LN) libxt_conntrack.so $(1)/usr/lib/iptables/libxt_state.so
 endef
 
 define Package/libxtables-nft/install

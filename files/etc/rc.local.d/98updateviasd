@@ -1,0 +1,46 @@
+#!/bin/sh
+
+ISROOTFSONSD="$(grep root=/dev/mmcblk1p /proc/cmdline)"
+
+if [ x"${ISROOTFSONSD}" = x"" ]; then
+    exit 0
+fi
+
+UPDATEFLAG="$(grep updateviasd=1 /proc/cmdline)"
+
+if [ x"${UPDATEFLAG}" = x"" ]; then
+    exit 0
+fi
+
+if [ ! -b "/dev/mmcblk1p3" ]; then
+    echo "No image partition found!"
+    exit 0
+fi
+
+MOUNTRETRY=0
+
+while [ ${MOUNTRETRY} -le 6 ];
+do
+    if [ -d "/mnt/mmcblk1p3" ]; then
+        break
+    fi
+
+    MOUNTRETRY=$(expr ${MOUNTRETRY} + 1)
+    sleep 5
+done
+
+if [ ! -d "/mnt/mmcblk1p3" ]; then
+    exit 0
+fi
+
+if [ -f "/mnt/mmcblk1p3/boot.img.gz" ]; then
+    gunzip -c "/mnt/mmcblk1p3/boot.img.gz" | dd of=/dev/mmcblk0p3
+fi
+
+if [ -f "/mnt/mmcblk1p3/rootfs.img.gz" ]; then
+    umount -f /dev/mmcblk0p6 2>/dev/null || true
+    gunzip -c "/mnt/mmcblk1p3/rootfs.img.gz" | dd of=/dev/mmcblk0p6
+fi
+
+touch "/tmp/pcat-shutdown.tmp"
+poweroff
